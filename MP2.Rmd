@@ -1,0 +1,115 @@
+---
+title: "MP2"
+author: "Jonah Kotzen"
+date: "2024-02-08"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+library(ggplot2)
+```
+
+
+```{r load, include = FALSE}
+
+arm_dat <- read_csv("MP2.csv")
+
+# Convert cm to m and g to kg
+arm_dat <- arm_dat %>%
+  mutate(
+    Larm = Larm / 100,
+    Li = Li / 100,
+    Lout = Lout/ 100,
+    Mmuscle = Mmuscle / 1000
+  )
+
+``` 
+
+# Define Functions for Calculations
+
+```{r chunk 1, include=TRUE}
+# Corrected and simplified functions for biomechanical calculations
+law_cos <- function(l, r, o) {
+  theta <- acos((-o^2 + l^2 + r^2) / (2 * l * r))
+  return(theta)
+}
+
+# Corrected law_cos2 function
+law_cos2 <- function(l, r, theta) {
+  o <- sqrt(l^2 + r^2 - 2 * l * r * cos(theta))
+  return(o)
+}
+
+force_length_factor <- function(Lmuscle, Lmuscler) {
+  Lopt <- Lmuscler * 0.8
+  ffl <- -6.25 * (Lmuscle / Lopt)^2 + 12.5 * (Lmuscle / Lopt) - 5.25
+  return(ffl)
+}
+
+calculate_Fmax <- function(Mmuscle, Lmuscler, rho = 0.00105, phi = 0, k = 80) {
+  PCSA <- (Mmuscle * cos(phi)) / (rho * Lmuscler)
+  Fmax <- PCSA * k
+  return(Fmax)
+}
+
+
+```
+
+
+## The Model Function
+
+```{r chunk5, include=TRUE}
+model <- function(Mmuscle, Lmuscler, Lmuscle, theta, Li, rho = 0.00105, k = 80) {
+  # Convert Lmuscler from m to cm for PCSA calculation (as ρ is given in kg/cm^3)
+  Lmuscler_cm <- Lmuscler * 100
+  # Assuming phi is 0 as the muscle is nonpennate
+  phi <- 0
+  # PCSA calculation
+  PCSA <- (Mmuscle * cos(phi)) / (rho * Lmuscler_cm)
+  # Fmax calculation
+  Fmax <- PCSA * k
+  # Force-length relationship factor (ffl)
+  ffl <- force_length_factor(Lmuscle, Lmuscler)
+  # Muscle force (Fmuscle)
+  Fmuscle <- Fmax * ffl
+  # Torque calculation (τmuscle)
+  tau_muscle <- Fmuscle * sin(theta) * Li
+  return(tau_muscle)
+}
+```
+
+
+# Applying the Model
+
+## Tibble for Angles
+```{r chunk6, include=TRUE}
+angles_df <- tibble(
+  flexion_deg = c(50, 75, 100, 125, 150),
+  flexion_rad = flexion_deg * pi / 180
+)
+```
+
+
+```{r chunk7, include=TRUE}
+# Perform a Cartesian join to combine all rows of arm_dat with all rows of angles_df
+expanded_arm_dat <- arm_dat %>%
+  expand_grid(angles_df)
+
+arm_dat_expanded <- expanded_arm_dat %>%
+  rowwise() %>%
+  mutate(
+    # Compute current muscle length (Lmuscle) using the law of cosines for each flexion angle
+    Lmuscle = law_cos2(Li, Larm, flexion_rad),  # Larm could represent Lmuscler, the muscle length at rest
+    # Compute theta using the law of cosines, considering Lmuscle as 'o', Li as 'l', and Larm as 'r'
+    theta = law_cos(Li, Larm, Lmuscle),  # Note: Larm here could be Lmuscler if it represents the muscle length at rest
+    # Compute torque using the muscle model
+    tau_muscle = model(Mmuscle, Larm, Lmuscle, theta, Li)
+  ) %>%
+  ungroup()
+
+arm_dat_expanded
+
+```
+
