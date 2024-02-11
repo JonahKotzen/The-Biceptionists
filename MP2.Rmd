@@ -5,6 +5,9 @@ date: "2024-02-08"
 output: html_document
 ---
 
+# intro 
+- sup guys
+
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 library(tidyverse)
