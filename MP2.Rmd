@@ -64,7 +64,7 @@ calculate_Fmax <- function(Mmuscle, Lmuscler, rho = 0.00105, phi = 0, k = 80) {
 
 ```{r chunk5, include=TRUE}
 model <- function(Mmuscle, Lmuscler, Lmuscle, theta, Li, rho = 0.00105, k = 80) {
-  # Convert Lmuscler from m to cm for PCSA calculation (as ρ is given in kg/cm^3)
+   # Convert Lmuscler from m to cm for PCSA calculation (as ρ is given in kg/cm^3)
   Lmuscler_cm <- Lmuscler * 100
   # Assuming phi is 0 as the muscle is nonpennate
   phi <- 0
@@ -85,46 +85,33 @@ model <- function(Mmuscle, Lmuscler, Lmuscle, theta, Li, rho = 0.00105, k = 80) 
 
 # Applying the Model
 
-## Tibble for Angles
+## Tibble for Angles & Gravity Constant (g)
 ```{r chunk6, include=TRUE}
-angles_df <- tibble(
+angles_tibble <- tibble(
   flexion_deg = c(50, 75, 100, 125, 150),
   flexion_rad = flexion_deg * pi / 180
 )
+
+# Assuming g = 9.81 m/s^2
+g <- 9.81
 ```
 
 
 ```{r chunk7, include=TRUE}
-# Perform a Cartesian join to combine all rows of arm_dat with all rows of angles_df
-expanded_arm_dat <- arm_dat %>%
-  expand_grid(angles_df)
-
-arm_dat_expanded <- expanded_arm_dat %>%
+# Calculate Lmuscle, theta, muscle_torque, and max_mass for each flexion angle
+dat <- arm_dat %>%
+  cross_join(angles_tibble) %>%
   rowwise() %>%
   mutate(
-    # Compute current muscle length (Lmuscle) using the law of cosines for each flexion angle
-    Lmuscle = law_cos2(Li, Larm, flexion_rad),  # Larm could represent Lmuscler, the muscle length at rest
-    # Compute theta using the law of cosines, considering Lmuscle as 'o', Li as 'l', and Larm as 'r'
-    theta = law_cos(Li, Larm, Lmuscle),  # Note: Larm here could be Lmuscler if it represents the muscle length at rest
-    # Compute torque using the muscle model
-    tau_muscle = model(Mmuscle, Larm, Lmuscle, theta, Li)
+    Lmuscle = law_cos2(Li, Larm, flexion_deg),#IS THIS SUPPOSED TO BE FLEX DEG OR FLEX RAD????? *crucial*
+    theta = law_cos(Li, Lmuscle, Larm),
+    muscle_torque = model(Mmuscle, Larm, Lmuscle, theta, Li),
+    max_mass = muscle_torque / (Lout * g)
   ) %>%
   ungroup()
 
-arm_dat_expanded
+# Display the updated tibble
+print(dat)
 
 ```
-# Max Mass
 
-```{r chunk8, include=TRUE}
-# Assuming g = 9.81 m/s^2
-g <- 9.81
-
-# Adding the max_mass calculation to your existing mutate call
-arm_dat_expanded <- arm_dat_expanded %>%
-  mutate(
-    # Compute max_mass based on the torque and out-lever length
-    max_mass = tau_muscle / (Lout * g)
-  )
-
-```

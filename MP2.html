@@ -385,7 +385,7 @@ calculate_Fmax &lt;- function(Mmuscle, Lmuscler, rho = 0.00105, phi = 0, k = 80)
 <div id="the-model-function" class="section level2">
 <h2>The Model Function</h2>
 <pre class="r"><code>model &lt;- function(Mmuscle, Lmuscler, Lmuscle, theta, Li, rho = 0.00105, k = 80) {
-  # Convert Lmuscler from m to cm for PCSA calculation (as ρ is given in kg/cm^3)
+   # Convert Lmuscler from m to cm for PCSA calculation (as ρ is given in kg/cm^3)
   Lmuscler_cm &lt;- Lmuscler * 100
   # Assuming phi is 0 as the muscle is nonpennate
   phi &lt;- 0
@@ -405,48 +405,48 @@ calculate_Fmax &lt;- function(Mmuscle, Lmuscler, rho = 0.00105, phi = 0, k = 80)
 </div>
 <div id="applying-the-model" class="section level1">
 <h1>Applying the Model</h1>
-<div id="tibble-for-angles" class="section level2">
-<h2>Tibble for Angles</h2>
-<pre class="r"><code>angles_df &lt;- tibble(
+<div id="tibble-for-angles-gravity-constant-g" class="section level2">
+<h2>Tibble for Angles &amp; Gravity Constant (g)</h2>
+<pre class="r"><code>angles_tibble &lt;- tibble(
   flexion_deg = c(50, 75, 100, 125, 150),
   flexion_rad = flexion_deg * pi / 180
-)</code></pre>
-<pre class="r"><code># Perform a Cartesian join to combine all rows of arm_dat with all rows of angles_df
-expanded_arm_dat &lt;- arm_dat %&gt;%
-  expand_grid(angles_df)
+)
 
-arm_dat_expanded &lt;- expanded_arm_dat %&gt;%
+# Assuming g = 9.81 m/s^2
+g &lt;- 9.81</code></pre>
+<pre class="r"><code># Calculate Lmuscle, theta, muscle_torque, and max_mass for each flexion angle
+dat &lt;- arm_dat %&gt;%
+  cross_join(angles_tibble) %&gt;%
   rowwise() %&gt;%
   mutate(
-    # Compute current muscle length (Lmuscle) using the law of cosines for each flexion angle
-    Lmuscle = law_cos2(Li, Larm, flexion_rad),  # Larm could represent Lmuscler, the muscle length at rest
-    # Compute theta using the law of cosines, considering Lmuscle as &#39;o&#39;, Li as &#39;l&#39;, and Larm as &#39;r&#39;
-    theta = law_cos(Li, Larm, Lmuscle),  # Note: Larm here could be Lmuscler if it represents the muscle length at rest
-    # Compute torque using the muscle model
-    tau_muscle = model(Mmuscle, Larm, Lmuscle, theta, Li)
+    Lmuscle = law_cos2(Li, Larm, flexion_rad),
+    theta = law_cos(Li, Lmuscle, Larm),
+    muscle_torque = model(Mmuscle, Larm, Lmuscle, theta, Li),
+    max_mass = muscle_torque / (Lout * g)
   ) %&gt;%
   ungroup()
 
-arm_dat_expanded</code></pre>
-<pre><code>## # A tibble: 15 × 10
+# Display the updated tibble
+print(dat)</code></pre>
+<pre><code>## # A tibble: 15 × 11
 ##    subject   Larm    Li  Lout Mmuscle flexion_deg flexion_rad Lmuscle theta
 ##    &lt;chr&gt;    &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;   &lt;dbl&gt;       &lt;dbl&gt;       &lt;dbl&gt;   &lt;dbl&gt; &lt;dbl&gt;
-##  1 Jonah    0.315 0.085 0.326   0.323          50       0.873   0.268 0.873
-##  2 Jonah    0.315 0.085 0.326   0.323          75       1.31    0.304 1.31 
-##  3 Jonah    0.315 0.085 0.326   0.323         100       1.75    0.340 1.75 
-##  4 Jonah    0.315 0.085 0.326   0.323         125       2.18    0.370 2.18 
-##  5 Jonah    0.315 0.085 0.326   0.323         150       2.62    0.391 2.62 
-##  6 Scarlett 0.32  0.058 0.287   0.241          50       0.873   0.286 0.873
-##  7 Scarlett 0.32  0.058 0.287   0.241          75       1.31    0.310 1.31 
-##  8 Scarlett 0.32  0.058 0.287   0.241         100       1.75    0.335 1.75 
-##  9 Scarlett 0.32  0.058 0.287   0.241         125       2.18    0.356 2.18 
-## 10 Scarlett 0.32  0.058 0.287   0.241         150       2.62    0.371 2.62 
-## 11 Ariana   0.265 0.054 0.276   0.165          50       0.873   0.234 0.873
-## 12 Ariana   0.265 0.054 0.276   0.165          75       1.31    0.256 1.31 
-## 13 Ariana   0.265 0.054 0.276   0.165         100       1.75    0.279 1.75 
-## 14 Ariana   0.265 0.054 0.276   0.165         125       2.18    0.299 2.18 
-## 15 Ariana   0.265 0.054 0.276   0.165         150       2.62    0.313 2.62 
-## # ℹ 1 more variable: tau_muscle &lt;dbl&gt;</code></pre>
+##  1 Jonah    0.315 0.085 0.326   0.323          50       0.873   0.268 2.02 
+##  2 Jonah    0.315 0.085 0.326   0.323          75       1.31    0.304 1.56 
+##  3 Jonah    0.315 0.085 0.326   0.323         100       1.75    0.340 1.15 
+##  4 Jonah    0.315 0.085 0.326   0.323         125       2.18    0.370 0.771
+##  5 Jonah    0.315 0.085 0.326   0.323         150       2.62    0.391 0.415
+##  6 Scarlett 0.32  0.058 0.287   0.241          50       0.873   0.286 2.11 
+##  7 Scarlett 0.32  0.058 0.287   0.241          75       1.31    0.310 1.65 
+##  8 Scarlett 0.32  0.058 0.287   0.241         100       1.75    0.335 1.22 
+##  9 Scarlett 0.32  0.058 0.287   0.241         125       2.18    0.356 0.826
+## 10 Scarlett 0.32  0.058 0.287   0.241         150       2.62    0.371 0.445
+## 11 Ariana   0.265 0.054 0.276   0.165          50       0.873   0.234 2.09 
+## 12 Ariana   0.265 0.054 0.276   0.165          75       1.31    0.256 1.63 
+## 13 Ariana   0.265 0.054 0.276   0.165         100       1.75    0.279 1.20 
+## 14 Ariana   0.265 0.054 0.276   0.165         125       2.18    0.299 0.812
+## 15 Ariana   0.265 0.054 0.276   0.165         150       2.62    0.313 0.437
+## # ℹ 2 more variables: muscle_torque &lt;dbl&gt;, max_mass &lt;dbl&gt;</code></pre>
 </div>
 </div>
 
