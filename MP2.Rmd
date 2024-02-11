@@ -5,9 +5,7 @@ date: "2024-02-08"
 output: html_document
 ---
 
-# intro 
-- sup guys
--hi back
+
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
@@ -116,4 +114,17 @@ arm_dat_expanded <- expanded_arm_dat %>%
 arm_dat_expanded
 
 ```
+# Max Mass
 
+```{r chunk8, include=TRUE}
+# Assuming g = 9.81 m/s^2
+g <- 9.81
+
+# Adding the max_mass calculation to your existing mutate call
+arm_dat_expanded <- arm_dat_expanded %>%
+  mutate(
+    # Compute max_mass based on the torque and out-lever length
+    max_mass = tau_muscle / (Lout * g)
+  )
+
+```
