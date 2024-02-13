@@ -1,7 +1,7 @@
 ---
 title: "MP2"
 author: "Jonah Kotzen"
-date: "2024-02-08"
+date: "2024-02-14"
 output: html_document
 ---
 
@@ -29,16 +29,23 @@ arm_dat <- arm_dat %>%
 
 ``` 
 
-# Define Functions for Calculations
+# Dataset for 3 Subjects (Jonah, Scarlett, Ari)
+
+```{r dataset, include=TRUE}
+
+print(arm_dat)
+
+```
+
+# Functions for Calculations
 
 ```{r chunk 1, include=TRUE}
-# Corrected and simplified functions for biomechanical calculations
+
 law_cos <- function(l, r, o) {
   theta <- acos((-o^2 + l^2 + r^2) / (2 * l * r))
   return(theta)
 }
 
-# Corrected law_cos2 function
 law_cos2 <- function(l, r, theta) {
   o <- sqrt(l^2 + r^2 - 2 * l * r * cos(theta))
   return(o)
@@ -85,8 +92,9 @@ model <- function(Mmuscle, Lmuscler, Lmuscle, theta, Li, rho = 0.00105, k = 80) 
 
 # Applying the Model
 
-## Tibble for Angles & Gravity Constant (g)
-```{r chunk6, include=TRUE}
+## Final Tibble
+
+```{r chunk6, include=FALSE}
 angles_tibble <- tibble(
   flexion_deg = c(50, 75, 100, 125, 150),
   flexion_rad = flexion_deg * pi / 180
@@ -94,10 +102,7 @@ angles_tibble <- tibble(
 
 # Assuming g = 9.81 m/s^2
 g <- 9.81
-```
 
-
-```{r chunk7, include=TRUE}
 # Calculate Lmuscle, theta, muscle_torque, and max_mass for each flexion angle
 dat1 <- arm_dat %>%
   cross_join(angles_tibble) %>%
@@ -115,14 +120,20 @@ select (subject, Lmuscler)
 dat3 <- dat1 %>%
   left_join(dat2, by = "subject")
 
-dat <- dat3 %>%
+dat_final <- dat3 %>%
   mutate(
     muscle_torque = model(Mmuscle, Lmuscler, Lmuscle, theta, Li),
     max_mass = muscle_torque / (Lout * g)
   ) %>%
   ungroup()
 
-# Display the updated tibble
+dat <- dat_final %>%
+  select(subject, flexion_rad, Lmuscle, theta, muscle_torque, max_mass)
+
+```
+
+```{r final tib, include=TRUE}
+
 print(dat)
 
 ```
@@ -134,7 +145,7 @@ print(dat)
 ```{r vis, include=TRUE}
 
 # Plot muscle torque for each flexion angle for each subject
-ggplot(dat, aes(x = flexion_deg, y = muscle_torque, group = subject, color = subject)) +
+ggplot(dat_final, aes(x = flexion_deg, y = muscle_torque, group = subject, color = subject)) +
   geom_line() +
   geom_point() +
   labs(title = "Muscle Torque at Each Flexion Angle",
@@ -142,18 +153,13 @@ ggplot(dat, aes(x = flexion_deg, y = muscle_torque, group = subject, color = sub
        y = "Muscle Torque (Nm)")
 
 # Plot max mass for each flexion angle for each subject
-ggplot(dat, aes(x = flexion_deg, y = max_mass, group = subject, color = subject)) +
+ggplot(dat_final, aes(x = flexion_deg, y = max_mass, group = subject, color = subject)) +
   geom_line() +
   geom_point() +
   labs(title = "Max Mass at Each Flexion Angle",
        x = "Flexion Angle (degrees)",
        y = "Max Mass (kg)")
 
-filtered_dat <- dat %>%
-  select(subject, flexion_deg, muscle_torque, max_mass)
-
-# Display the filtered DataFrame
-print(filtered_dat)
 
 ```
 
@@ -165,14 +171,12 @@ print(filtered_dat)
 
 ## How did your gym testing compare to your model estimations? That is, was it more or less than predicted?
 
-- In gym testing, we were able to lift more than the model predicted. This discrepancy could be due to the model not accounting for synergistic muscle actions, neural adaptations, individual biomechanical differences, and psychological factors that can enhance performance. Essentially, real-world performance can exceed model predictions due to the complex interplay of physiological and psychological factors not fully captured by the model.
-
-
-
-
-
+- In gym testing, we were able to lift more than the model predicted. 
 
 
 ## If the model was produced poor predictions, why?
+
+- This discrepancy could be due to the model not accounting for synergistic muscle actions, neural adaptations, individual biomechanical differences, and psychological factors that can enhance performance. Essentially, real-world performance can exceed model predictions due to the complex interplay of physiological and psychological factors not fully captured by the model.
+
 
 
