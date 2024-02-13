@@ -39,8 +39,8 @@ law_cos <- function(l, r, o) {
 }
 
 # Corrected law_cos2 function
-law_cos2 <- function(l, r, theta) {
-  o <- sqrt(l^2 + r^2 - 2 * l * r * cos(theta))
+law_cos2 <- function(l, r, flexion_rad) {
+  o <- sqrt(l^2 + r^2 - 2 * l * r * cos(flexion_rad))
   return(o)
 }
 
@@ -63,9 +63,9 @@ calculate_Fmax <- function(Mmuscle, Lmuscler, rho = 0.00105, phi = 0, k = 80) {
 ## The Model Function
 
 ```{r chunk5, include=TRUE}
-model <- function(Mmuscle, Lmuscler, Lmuscle, theta, Li, rho = 0.00105, k = 80) {
+model <- function(Mmuscle, Larm, Lmuscle, theta, Li, rho = 0.00105, k = 80) {
    # Convert Lmuscler from m to cm for PCSA calculation (as ρ is given in kg/cm^3)
-  Lmuscler_cm <- Lmuscler * 100
+  Lmuscler_cm <- (Lmuscler*100)
   # Assuming phi is 0 as the muscle is nonpennate
   phi <- 0
   # PCSA calculation
@@ -103,7 +103,7 @@ dat <- arm_dat %>%
   cross_join(angles_tibble) %>%
   rowwise() %>%
   mutate(
-    Lmuscle = law_cos2(Li, Larm, flexion_deg),#IS THIS SUPPOSED TO BE FLEX DEG OR FLEX RAD????? *crucial*
+    Lmuscle = law_cos2(Li, Larm, flexion_rad), 
     theta = law_cos(Li, Lmuscle, Larm),
     muscle_torque = model(Mmuscle, Larm, Lmuscle, theta, Li),
     max_mass = muscle_torque / (Lout * g)
@@ -115,3 +115,43 @@ print(dat)
 
 ```
 
+# Areas to Address
+
+## What were your predicted τ muscle and Mload values at each flexion angle?
+
+```{r vis, include=TRUE}
+
+# Plot muscle torque for each flexion angle for each subject
+ggplot(dat, aes(x = flexion_deg, y = muscle_torque, group = subject, color = subject)) +
+  geom_line() +
+  geom_point() +
+  labs(title = "Muscle Torque at Each Flexion Angle",
+       x = "Flexion Angle (degrees)",
+       y = "Muscle Torque (Nm)")
+
+# Plot max mass for each flexion angle for each subject
+ggplot(dat, aes(x = flexion_deg, y = max_mass, group = subject, color = subject)) +
+  geom_line() +
+  geom_point() +
+  labs(title = "Max Mass at Each Flexion Angle",
+       x = "Flexion Angle (degrees)",
+       y = "Max Mass (kg)")
+
+
+ggplot(dat, aes(x = flexion_deg, y = theta)) +
+  geom_line() +
+  geom_point() +
+  labs(title = "Theta vs. Flexion Degree",
+       x = "Flexion Angle (degrees)",
+       y = "Theta (radians)")
+```
+
+
+## Is there any pattern to these values? What explains these patterns?
+
+- Positive correlation doesn't really make sense??
+
+
+## How did your gym testing compare to your model estimations? That is, was it more or less than predicted?
+
+## If the model was produced poor predictions, why?
