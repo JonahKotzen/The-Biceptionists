@@ -12,7 +12,7 @@ This project works to uncover how skeletal geometry and muscle length and mass a
 
 # Methods
 
-Arm length, inlever length, and outlever length were measured in lab using a meter stick. Bicep weight was predicted by weighing play-dough and approximating the size of each participant's bicep muscle. Computational analysis is as follows usuing the Hill-type muscle model [@hill1938heat]. Additionally, we utilized relationship approximation between force and muscle length for mammalian skeletal muscle [@whiting1999theoretical]. 
+Arm length, inlever length, and outlever length were measured in lab using a meter stick. Bicep weight was predicted by weighing play-dough and approximating the size of each participant's bicep muscle. Computational analysis is as follows usuing the Hill-type muscle model [@hill1938heat]. Additionally, we utilized the relationship approximation between force and muscle length for mammalian skeletal muscle [@whiting1999theoretical]. 
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
@@ -172,26 +172,17 @@ ggplot(dat_final, aes(x = flexion_deg, y = max_mass, group = subject, color = su
 
 # Discussion 
 
-### What were your predicted τ muscle and Mload values at each flexion angle?
-- The predicted muscle torque and Mload values at each flexion angle are displayed in both the table and graphs above. 
+The predicted muscle torque and Mload values at each flexion angle are displayed in both the table and graphs above. The data shows a trend where muscle torque and max mass generally peak around 75 degrees of flexion for all three subjects, indicating an optimal angle for force generation due to favorable muscle length-tension relationships and lever mechanics. Beyond this angle, both torque and mass support capability decrease, likely due to reduced leverage and less effective muscle contraction angles. This pattern highlights the significance of biomechanics in understanding physical performance.
 
+In gym testing, we were on average able to lift more than the model predicted. Ari was able to lift approximately 2.3 kg above the calculated max mass, and Scarlett was able to lift approximately 2.5 kg above the calculated max mass. Opposite of two participants, Jonah lifted approximately 2.7 kg under the predicted max mass. This could be due to over approximation of bicep mass in addition to inaccurate conversion when at the gym.
 
-### Is there any pattern to these values? What explains these patterns?
+This discrepancy could be due to the model not accounting for synergistic muscle actions, neural adaptations, individual biomechanical differences, and psychological factors that can enhance performance. Essentially, real-world performance can exceed model predictions due to the complex interplay of physiological and psychological factors not fully captured by the model. Additionally, other muscles present in the upper arm and shoulder could have compensated for the bicep and aided in the lifting, resulting in participants being able to lift on average a heavier mass than predicted. 
 
-- The data shows a trend where muscle torque and max mass generally peak around 75 degrees of flexion for all three subjects, indicating an optimal angle for force generation due to favorable muscle length-tension relationships and lever mechanics. Beyond this angle, both torque and mass support capability decrease, likely due to reduced leverage and less effective muscle contraction angles. This pattern highlights the significance of biomechanics in understanding physical performance.
-
-
-### How did your gym testing compare to your model estimations? That is, was it more or less than predicted?
-
-- In gym testing, we were able to lift more than the model predicted. 
-
-
-### If the model was produced poor predictions, why?
-
-- This discrepancy could be due to the model not accounting for synergistic muscle actions, neural adaptations, individual biomechanical differences, and psychological factors that can enhance performance. Essentially, real-world performance can exceed model predictions due to the complex interplay of physiological and psychological factors not fully captured by the model. Additionally, other muscles present in the upper arm and shoulder could have compensated for the bicep and aided in the lifting, resulting in participants being able to lift a heavier mass than predicted. 
+Many advancements have been made in the the analysis of musculoskeletal systems, including the Hill-type muscle model studied by @hill1938heat and the force and muscle length approximation equation studied by @whiting1999theoretical. However our data shows how more research must be done in order to better analyze and predict how skeletal geometry and muscle length and mass affect both the force output in the forelimb and the maximum load it can support. 
 
 
 # Author Contributions
 
 
 # References
+
