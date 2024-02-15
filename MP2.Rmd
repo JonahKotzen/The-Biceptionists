@@ -1,10 +1,15 @@
 ---
 title: "MP2"
-author: "Jonah Kotzen"
+author: "Jonah Kotzen, Scarlett Varley, Ariana Roberts"
 date: "2024-02-14"
 output: html_document
 ---
 
+# Introduction
+
+This project works to uncover how skeletal geometry and muscle length and mass affect both the force output in the forelimb and the maximum load it can support. The project aims to predict how much force and torque are produced by the biceps system over a range of extension/flexion angles, assess how force and torque vary according to extension/flexion angle, and test these predictions in the gym. The question will be answered through computational analysis of torque, force, and maximum mass at respective angles with the measurements of arm length, inlever length, outlever length, and weight of bicep. 
+
+# Methods
 
 
 ```{r setup, include=FALSE}
@@ -29,7 +34,7 @@ arm_dat <- arm_dat %>%
 
 ``` 
 
-# Dataset for 3 Subjects (Jonah, Scarlett, Ari)
+### Dataset for 3 Subjects (Jonah, Scarlett, Ari)
 
 ```{r dataset, include=TRUE}
 
@@ -37,7 +42,7 @@ print(arm_dat)
 
 ```
 
-# Functions for Calculations
+### Functions for Calculations
 
 ```{r chunk 1, include=TRUE}
 
@@ -67,7 +72,7 @@ calculate_Fmax <- function(Mmuscle, Lmuscler, rho = 0.00105, phi = 0, k = 80) {
 ```
 
 
-## The Model Function
+### The Model Function
 
 ```{r chunk5, include=TRUE}
 model <- function(Mmuscle, Lmuscler, Lmuscle, theta, Li, rho = 0.00105, k = 80) {
@@ -90,9 +95,11 @@ model <- function(Mmuscle, Lmuscler, Lmuscle, theta, Li, rho = 0.00105, k = 80) 
 ```
 
 
-# Applying the Model
+# Results
 
-## Final Tibble
+The results obtained display the length of bicep muscle, muscle torque, max mass for degree angles 50, 75, 125, and 150 for each person. The two graphs display muscle torque (Nm) at each flexion angle and max mass (kg) at each flexion angle. 
+
+### Final Tibble
 
 ```{r chunk6, include=FALSE}
 angles_tibble <- tibble(
@@ -138,9 +145,7 @@ print(dat)
 
 ```
 
-# Areas to Address
-
-## What were your predicted τ muscle and Mload values at each flexion angle?
+### Graphs
 
 ```{r vis, include=TRUE}
 
@@ -163,20 +168,30 @@ ggplot(dat_final, aes(x = flexion_deg, y = max_mass, group = subject, color = su
 
 ```
 
+# Discussion 
 
-## Is there any pattern to these values? What explains these patterns?
+### What were your predicted τ muscle and Mload values at each flexion angle?
+- The predicted muscle torque and Mload values at each flexion angle are displayed in both the table and graph above. 
+
+
+### Is there any pattern to these values? What explains these patterns?
 
 - The data shows a trend where muscle torque and max mass generally peak around 75 degrees of flexion for all three subjects, indicating an optimal angle for force generation due to favorable muscle length-tension relationships and lever mechanics. Beyond this angle, both torque and mass support capability decrease, likely due to reduced leverage and less effective muscle contraction angles. This pattern highlights the significance of biomechanics in understanding physical performance.
 
 
-## How did your gym testing compare to your model estimations? That is, was it more or less than predicted?
+### How did your gym testing compare to your model estimations? That is, was it more or less than predicted?
 
 - In gym testing, we were able to lift more than the model predicted. 
 
 
-## If the model was produced poor predictions, why?
+### If the model was produced poor predictions, why?
 
 - This discrepancy could be due to the model not accounting for synergistic muscle actions, neural adaptations, individual biomechanical differences, and psychological factors that can enhance performance. Essentially, real-world performance can exceed model predictions due to the complex interplay of physiological and psychological factors not fully captured by the model.
 
+
+# Author Contributions
+
+
+# References
 
 
