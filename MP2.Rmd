@@ -3,6 +3,7 @@ title: "MP2"
 author: "Jonah Kotzen, Scarlett Varley, Ariana Roberts"
 date: "2024-02-14"
 output: html_document
+bibliography: BIOL5380.bib
 ---
 
 # Introduction
