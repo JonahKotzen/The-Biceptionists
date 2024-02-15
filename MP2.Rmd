@@ -12,6 +12,7 @@ This project works to uncover how skeletal geometry and muscle length and mass a
 
 # Methods
 
+Arm length, inlever length, and outlever length were measured in lab using a meter stick. Bicep weight was predicted by weighing play-dough and approximating the size of each participant's bicep muscle. Computational analysis is as follows usuing the Hill-type muscle model [@hill1938not]. Additionally, we utilized relationship approximation between force and muscle length for mammalian skeletal muscle [@whiting1999not]. 
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
@@ -172,7 +173,7 @@ ggplot(dat_final, aes(x = flexion_deg, y = max_mass, group = subject, color = su
 # Discussion 
 
 ### What were your predicted τ muscle and Mload values at each flexion angle?
-- The predicted muscle torque and Mload values at each flexion angle are displayed in both the table and graph above. 
+- The predicted muscle torque and Mload values at each flexion angle are displayed in both the table and graphs above. 
 
 
 ### Is there any pattern to these values? What explains these patterns?
@@ -187,7 +188,7 @@ ggplot(dat_final, aes(x = flexion_deg, y = max_mass, group = subject, color = su
 
 ### If the model was produced poor predictions, why?
 
-- This discrepancy could be due to the model not accounting for synergistic muscle actions, neural adaptations, individual biomechanical differences, and psychological factors that can enhance performance. Essentially, real-world performance can exceed model predictions due to the complex interplay of physiological and psychological factors not fully captured by the model.
+- This discrepancy could be due to the model not accounting for synergistic muscle actions, neural adaptations, individual biomechanical differences, and psychological factors that can enhance performance. Essentially, real-world performance can exceed model predictions due to the complex interplay of physiological and psychological factors not fully captured by the model. Additionally, other muscles present in the upper arm and shoulder could have compensated for the bicep and aided in the lifting, resulting in participants being able to lift a heavier mass than predicted. 
 
 
 # Author Contributions
