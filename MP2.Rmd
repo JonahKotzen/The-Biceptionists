@@ -12,7 +12,7 @@ This project works to uncover how skeletal geometry and muscle length and mass a
 
 # Methods
 
-Arm length, inlever length, and outlever length were measured in lab using a meter stick. Bicep weight was predicted by weighing play-dough and approximating the size of each participant's bicep muscle. Computational analysis is as follows usuing the Hill-type muscle model [@hill1938not]. Additionally, we utilized relationship approximation between force and muscle length for mammalian skeletal muscle [@whiting1999not]. 
+Arm length, inlever length, and outlever length were measured in lab using a meter stick. Bicep weight was predicted by weighing play-dough and approximating the size of each participant's bicep muscle. Computational analysis is as follows usuing the Hill-type muscle model [@hill1938heat]. Additionally, we utilized relationship approximation between force and muscle length for mammalian skeletal muscle [@whiting1999theoretical]. 
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
@@ -195,5 +195,3 @@ ggplot(dat_final, aes(x = flexion_deg, y = max_mass, group = subject, color = su
 
 
 # References
-
-
